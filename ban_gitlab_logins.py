@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # === Configuration ===
 LOGFILE = "/var/log/gitlab/gitlab-rails/production_json.log"
 BAN_LOG = "/var/log/gitlab-login-ban.log"
-MAX_RETRIES = 3
+MAX_RETRIES = 5
 FIND_TIME_SECONDS = 3600  # 1 hour
 NGINX_BLOCKLIST = "/etc/gitlab/nginx/custom/ip_blocklist.conf"
 NGINX_META_FILE = "/etc/gitlab/nginx/custom/ip_blocklist_meta.json"
