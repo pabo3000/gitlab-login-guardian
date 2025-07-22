@@ -73,16 +73,38 @@ def block_in_nginx(ip):
     if ip in meta:
         return  # already blocked
 
+    meta[ip] = datetime.utcnow().isoformat()
+    save_block_meta(meta)
+
+    # Load current blocklist if exists
+    lines = []
+    if os.path.exists(NGINX_BLOCKLIST):
+        with open(NGINX_BLOCKLIST, "r") as f:
+            lines = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
+
+    # Remove all existing deny and allow lines
+    deny_ips = set()
+    for line in lines:
+        if line.startswith("deny"):
+            deny_ip = line.replace("deny", "").replace(";", "").strip()
+            deny_ips.add(deny_ip)
+
+    # Add new IP to deny list
+    deny_ips.add(ip)
+
+    # Sort and reconstruct blocklist
+    sorted_lines = [f"deny {deny};" for deny in sorted(deny_ips)]
+    sorted_lines.append("allow all;")
+
     try:
-        with open(NGINX_BLOCKLIST, "a") as f:
-            f.write(f"deny {ip};\n")
-        meta[ip] = datetime.utcnow().isoformat()
-        save_block_meta(meta)
-        log(f"Blocked IP {ip} in NGINX.")
+        with open(NGINX_BLOCKLIST, "w") as f:
+            f.write("\n".join(sorted_lines) + "\n")
+
+        log(f"IP {ip} added to NGINX blocklist.")
         subprocess.run(["gitlab-ctl", "hup", "nginx"], check=True)
-        log("Reloaded NGINX after ban.")
+        log("Reloaded NGINX after blocking IP.")
     except Exception as e:
-        log(f"Error blocking IP {ip} in NGINX: {e}")
+        log(f"Error blocking {ip} in NGINX: {e}")
 
 
 # === Tail the GitLab log ===
@@ -126,5 +148,27 @@ def main():
             block_in_nginx(ip)
 
 
+def init_files():
+    os.makedirs(os.path.dirname(BAN_LOG), exist_ok=True)
+    os.makedirs(os.path.dirname(NGINX_META_FILE), exist_ok=True)
+    os.makedirs(os.path.dirname(NGINX_BLOCKLIST), exist_ok=True)
+
+    # Lege Log-Datei an, wenn nicht vorhanden
+    if not os.path.exists(BAN_LOG):
+        with open(BAN_LOG, "w") as f:
+            f.write("")  # leere Datei anlegen
+
+    # Lege leere JSON-Datei für Metadaten an, wenn nicht vorhanden
+    if not os.path.exists(NGINX_META_FILE):
+        with open(NGINX_META_FILE, "w") as f:
+            json.dump({}, f)
+
+    # Lege Blocklist-Datei an, falls sie fehlt
+    if not os.path.exists(NGINX_BLOCKLIST):
+        with open(NGINX_BLOCKLIST, "w") as f:
+            f.write("")
+
+
 if __name__ == "__main__":
+    init_files()
     main()
