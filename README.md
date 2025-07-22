@@ -109,6 +109,3 @@ MIT License — free for personal and commercial use.
 ## ✉️ Maintainer
 
 🐙 https://github.com/pabo3000
-
-
-Wenn du möchtest, kann ich auch noch eine `setup.sh` zum automatisierten Einrichten der Pfade, Datei-Erstellung und Service-Installation erstellen. Sag einfach Bescheid.
