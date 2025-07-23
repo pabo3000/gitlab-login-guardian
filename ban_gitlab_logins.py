@@ -109,14 +109,31 @@ def block_in_nginx(ip):
 
 # === Tail the GitLab log ===
 def tail_log(filepath):
-    with open(filepath, "r") as f:
-        f.seek(0, os.SEEK_END)
-        while True:
-            line = f.readline()
-            if not line:
-                time.sleep(1)
-                continue
+    """
+    Follows a logfile and yields new lines.
+    Reopens the file if it has been rotated.
+    """
+    file = open(filepath, "r")
+    file.seek(0, os.SEEK_END)
+    inode = os.fstat(file.fileno()).st_ino
+
+    while True:
+        line = file.readline()
+        if line:
             yield line.strip()
+        else:
+            try:
+                if os.stat(filepath).st_ino != inode:
+                    # Logfile was rotated
+                    file.close()
+                    file = open(filepath, "r")
+                    inode = os.fstat(file.fileno()).st_ino
+                    file.seek(0, os.SEEK_END)
+            except FileNotFoundError:
+                # File temporarily unavailable
+                time.sleep(1)
+            time.sleep(1)
+
 
 
 # === Main Loop ===
