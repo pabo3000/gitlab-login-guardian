@@ -5,16 +5,12 @@ set -e
 echo "===> Updating gitlab-login-guardian..."
 
 # Configuration
-REPO_DIR="/opt/gitlab-login-guardian"
-REPO_URL="https://github.com/pabo3000/gitlab-login-guardian.git"
+REPO_DIR="$(pwd)"  # Use current directory as repo path
 
 # Pull latest changes or clone repository if missing
 if [ -d "$REPO_DIR/.git" ]; then
   echo "-> Pulling latest changes from GitHub..."
   git -C "$REPO_DIR" pull
-else
-  echo "-> Cloning repository into \"$REPO_DIR\" ..."
-  git clone "$REPO_URL" "$REPO_DIR"
 fi
 
 # Run setup script
