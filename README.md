@@ -72,6 +72,22 @@ sudo gitlab-ctl reconfigure
 
 That’s it — your GitLab server is now protected from repeated login attempts via dynamic NGINX IP banning. 💪
 
+## 🔄 Update
+
+To update GitLab Login Guardian to the latest version:
+
+```bash
+sudo /opt/gitlab-login-guardian/update.sh
+```
+
+This will:
+
+Pull the latest changes from the GitHub repository
+
+Restart the gitlab-ban-monitor.service systemd service
+
+⚠️ Make sure you haven't made local changes in /opt/gitlab-login-guardian, or they might be overwritten.
+
 ## Uninstallation
 
 To remove GitLab Login Guardian:
