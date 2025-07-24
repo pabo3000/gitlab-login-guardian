@@ -3,40 +3,39 @@ set -e
 
 echo "🔐 Setting up GitLab Login Guardian..."
 
-# Configuration
-SCRIPT_SOURCE="ban_gitlab_logins.py"
-SCRIPT_DEST="/usr/local/bin/ban_gitlab_logins.py"
+# === Configuration ===
+REPO_DIR="/opt/gitlab-login-guardian"
+SCRIPT_DEST="/usr/local/bin/gitlab_login_guardian_main.py"
 BLOCKLIST_DIR="/etc/gitlab/nginx/custom"
 BLOCKLIST_FILE="$BLOCKLIST_DIR/ip_blocklist.conf"
 META_FILE="$BLOCKLIST_DIR/ip_blocklist_meta.json"
 LOGFILE="/var/log/gitlab-login-ban.log"
 SERVICE_FILE="/etc/systemd/system/gitlab-ban-monitor.service"
 
-# 1. Ensure necessary directories exist
+# === 1. Prepare directories ===
 echo "📁 Creating required directories..."
 sudo mkdir -p "$BLOCKLIST_DIR"
+sudo mkdir -p "$(dirname "$LOGFILE")"
 
-# 2. Copy the script and create log/meta files
-echo "📄 Copying script and creating metadata files..."
-sudo cp "$SCRIPT_SOURCE" "$SCRIPT_DEST"
+# === 2. Copy main script to /usr/local/bin ===
+echo "📄 Installing main script..."
+sudo cp "$REPO_DIR/main.py" "$SCRIPT_DEST"
 sudo chmod +x "$SCRIPT_DEST"
 
-sudo touch "$BLOCKLIST_FILE"
-sudo touch "$META_FILE"
-sudo chmod 644 "$BLOCKLIST_FILE" "$META_FILE"
+# === 3. Create empty log and metadata files ===
+echo "🛠️ Creating metadata and log files..."
+sudo touch "$BLOCKLIST_FILE" "$META_FILE" "$LOGFILE"
+sudo chmod 644 "$BLOCKLIST_FILE" "$META_FILE" "$LOGFILE"
 
-sudo touch "$LOGFILE"
-sudo chmod 644 "$LOGFILE"
-
-# 3. Create the systemd service unit
-echo "⚙️ Creating systemd service..."
+# === 4. Create systemd service ===
+echo "⚙️ Creating systemd service unit..."
 sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Monitor GitLab failed login attempts and ban IPs via NGINX
 After=network.target
 
 [Service]
-ExecStart=$SCRIPT_DEST
+ExecStart=/usr/bin/python3 $SCRIPT_DEST
 Restart=always
 User=root
 
@@ -44,15 +43,15 @@ User=root
 WantedBy=multi-user.target
 EOF
 
-# 4. Enable and start the service
+# === 5. Enable and start service ===
 echo "🚀 Enabling and starting the service..."
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable --now gitlab-ban-monitor.service
 
-# 5. Reminder for gitlab.rb configuration
+# === 6. Reminder for gitlab.rb ===
 echo
-echo "📌 Please make sure the following line is present in your /etc/gitlab/gitlab.rb:"
+echo "📌 Please make sure this line is present in /etc/gitlab/gitlab.rb:"
 echo
 echo "nginx['custom_gitlab_server_config'] = \"include $BLOCKLIST_FILE;\""
 echo
