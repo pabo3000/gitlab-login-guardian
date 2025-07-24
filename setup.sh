@@ -16,6 +16,7 @@ SERVICE_FILE="/etc/systemd/system/gitlab-ban-monitor.service"
 # === 1. Prepare directories ===
 echo "📁 Creating required directories..."
 sudo mkdir -p "$BLOCKLIST_DIR"
+sudo mkdir -p "$(dirname "$SCRIPT_DEST")"
 sudo mkdir -p "$(dirname "$LOGFILE")"
 
 # === 2. Copy main script to /usr/local/bin ===
