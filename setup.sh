@@ -5,7 +5,8 @@ echo "🔐 Setting up GitLab Login Guardian..."
 
 # === Configuration ===
 REPO_DIR="$(pwd)/gitlab-login-guardian"
-SCRIPT_DEST="/usr/local/bin/gitlab_login_guardian_main.py"
+SCRIPT_SOURCE="gitlab_login_guardian/main.py"
+SCRIPT_DEST="/usr/local/bin/gitlab_login_guardian/main.py"
 BLOCKLIST_DIR="/etc/gitlab/nginx/custom"
 BLOCKLIST_FILE="$BLOCKLIST_DIR/ip_blocklist.conf"
 META_FILE="$BLOCKLIST_DIR/ip_blocklist_meta.json"
@@ -19,7 +20,7 @@ sudo mkdir -p "$(dirname "$LOGFILE")"
 
 # === 2. Copy main script to /usr/local/bin ===
 echo "📄 Installing main script..."
-sudo cp "$REPO_DIR/main.py" "$SCRIPT_DEST"
+sudo cp "$SCRIPT_SOURCE" "$SCRIPT_DEST"
 sudo chmod +x "$SCRIPT_DEST"
 
 # === 3. Create empty log and metadata files ===
