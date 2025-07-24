@@ -70,7 +70,7 @@ class GitlabLoginGuardian:
         
         allow_seen = False
         lines = []
-        
+
         # Load current blocklist if exists
         if os.path.exists(self.blocklist_file):
             with open(self.blocklist_file, "r") as f:
@@ -80,8 +80,8 @@ class GitlabLoginGuardian:
                         break
                     if line.strip() and not line.strip().startswith("#"):
                         lines.append(line.strip())
-                        
-         # Remove all existing deny and allow lines
+
+        # Extract deny IPs
         deny_ips = set()
         for line in lines:
             if line.startswith("deny"):
@@ -90,14 +90,16 @@ class GitlabLoginGuardian:
 
         # Add new IP to deny list
         deny_ips.add(ip)
-        
+
         # Sort and reconstruct blocklist
         sorted_lines = [f"deny {deny};" for deny in sorted(deny_ips)]
         sorted_lines.append("allow all;")
 
+        # Write to blocklist
         try:
             with open(self.blocklist_file, "w") as f:
-                f.write("\n".join(sorted_lines) + "\n")
+                for line in sorted_lines:
+                    f.write(f"{line}\n")
 
             log(f"IP {ip} added to NGINX blocklist.")
             subprocess.run(["gitlab-ctl", "hup", "nginx"], check=True)
