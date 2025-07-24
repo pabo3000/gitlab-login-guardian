@@ -11,13 +11,7 @@ BAN_DURATION_HOURS = 164  # 1 week
 
 
 class GitlabLoginGuardian:
-    def __init__(
-        self,
-        log_file="/var/log/gitlab/gitlab-rails/production_json.log",
-        ban_log="/var/log/gitlab-login-ban.log",
-        blocklist_file="/etc/gitlab/nginx/custom/ip_blocklist.conf",
-        meta_file="/etc/gitlab/nginx/custom/ip_blocklist_meta.json",
-    ):
+    def __init__(self, log_file, ban_log, blocklist_file, meta_file):
         self.log_file = log_file
         self.ban_log = ban_log
         self.blocklist_file = blocklist_file

@@ -14,7 +14,7 @@ guardian.log("GitLab Login Guardian started")
 
 try:
     while True:
-        guardian.process_fail2ban_log()
+        guardian.monitor_logins()
         guardian.cleanup()
         time.sleep(10)
 except KeyboardInterrupt:
