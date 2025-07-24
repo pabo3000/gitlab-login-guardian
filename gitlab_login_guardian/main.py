@@ -1,4 +1,4 @@
-from gitlab_login_guardian import GitlabLoginGuardian
+from core import GitlabLoginGuardian
 
 guardian = GitlabLoginGuardian(
     log_file="/var/log/gitlab/gitlab-rails/production_json.log",
