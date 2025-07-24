@@ -1,14 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name='gitlab-login-guardian',
-    version='0.1',
-    py_modules=['ban_gitlab_logins'],
-    entry_points={
-        'console_scripts': [
-            'gitlab-login-guardian=ban_gitlab_logins:main',
-        ],
-    },
+    name="gitlab_login_guardian",
+    version="0.1",
+    packages=find_packages(),
+    install_requires=[],
     author='Pavel Bogdanovic',
     description='Block IPs from repeated GitLab login failures via NGINX',
     license='MIT',
