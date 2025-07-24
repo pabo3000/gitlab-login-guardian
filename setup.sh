@@ -37,7 +37,8 @@ Description=Monitor GitLab failed login attempts and ban IPs via NGINX
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 $SCRIPT_DEST
+ExecStart=/usr/bin/python3 $SCRIPT_DEST/main.py
+
 Restart=always
 User=root
 
