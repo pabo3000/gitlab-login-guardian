@@ -5,7 +5,7 @@ set -e
 echo "===> Updating gitlab-login-guardian..."
 
 # Configuration
-REPO_DIR="$(pwd)/gitlab-login-guardian"  # Use current directory as repo path
+REPO_DIR="$(pwd)"  # Use current directory as repo path
 
 # Pull latest changes or clone repository if missing
 if [ -d "$REPO_DIR/.git" ]; then
