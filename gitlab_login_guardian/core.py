@@ -63,12 +63,15 @@ class GitlabLoginGuardian:
     def block_ip(self, ip):
         meta = self.load_meta()
         if ip in meta:
-            return
+            return  # already blocked
 
-        lines = []
+        meta[ip] = datetime.utcnow().isoformat()
+        self.save_meta(meta)
+        
         allow_seen = False
-
-        # Wenn Datei existiert, nur alles vor "allow all;" einlesen
+        lines = []
+        
+        # Load current blocklist if exists
         if os.path.exists(self.blocklist_file):
             with open(self.blocklist_file, "r") as f:
                 for line in f:
@@ -77,21 +80,31 @@ class GitlabLoginGuardian:
                         break
                     if line.strip() and not line.strip().startswith("#"):
                         lines.append(line.strip())
+                        
+         # Remove all existing deny and allow lines
+        deny_ips = set()
+        for line in lines:
+            if line.startswith("deny"):
+                deny_ip = line.replace("deny", "").replace(";", "").strip()
+                deny_ips.add(deny_ip)
 
-        # Neue deny-Liste schreiben
-        with open(self.blocklist_file, "w") as f:
-            for ip in sorted(blocked_ips):
-                f.write(f"deny {ip};\n")
-            if allow_seen:
-                f.write("allow all;\n")
-        meta[ip] = datetime.utcnow().isoformat()
-        self.save_meta(meta)
-        self.log(f"Blocked IP {ip} in NGINX.")
+        # Add new IP to deny list
+        deny_ips.add(ip)
+        
+        # Sort and reconstruct blocklist
+        sorted_lines = [f"deny {deny};" for deny in sorted(deny_ips)]
+        sorted_lines.append("allow all;")
+
         try:
+            with open(self.blocklist_file, "w") as f:
+                f.write("\n".join(sorted_lines) + "\n")
+
+            log(f"IP {ip} added to NGINX blocklist.")
             subprocess.run(["gitlab-ctl", "hup", "nginx"], check=True)
-            self.log("Reloaded NGINX after block.")
+            log("Reloaded NGINX after blocking IP.")
         except Exception as e:
-            self.log(f"Failed to reload NGINX: {e}")
+            log(f"Error blocking {ip} in NGINX: {e}")
+
 
     def tail_log(self):
         with open(self.log_file, "r") as f:
