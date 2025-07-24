@@ -101,12 +101,11 @@ class GitlabLoginGuardian:
                 for line in sorted_lines:
                     f.write(f"{line}\n")
 
-            log(f"IP {ip} added to NGINX blocklist.")
+            self.log(f"IP {ip} added to NGINX blocklist.")
             subprocess.run(["gitlab-ctl", "hup", "nginx"], check=True)
-            log("Reloaded NGINX after blocking IP.")
+            self.log("Reloaded NGINX after blocking IP.")
         except Exception as e:
-            log(f"Error blocking {ip} in NGINX: {e}")
-
+            self.log(f"Error blocking {ip} in NGINX: {e}")
 
     def tail_log(self):
         with open(self.log_file, "r") as f:
