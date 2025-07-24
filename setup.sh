@@ -4,7 +4,7 @@ set -e
 echo "🔐 Setting up GitLab Login Guardian..."
 
 # === Configuration ===
-REPO_DIR="$(pwd)" 
+REPO_DIR="$(pwd)/gitlab-login-guardian "
 SCRIPT_DEST="/usr/local/bin/gitlab_login_guardian_main.py"
 BLOCKLIST_DIR="/etc/gitlab/nginx/custom"
 BLOCKLIST_FILE="$BLOCKLIST_DIR/ip_blocklist.conf"
