@@ -65,8 +65,25 @@ class GitlabLoginGuardian:
         if ip in meta:
             return
 
-        with open(self.blocklist_file, "a") as f:
-            f.write(f"deny {ip};\n")
+        lines = []
+        allow_seen = False
+
+        # Wenn Datei existiert, nur alles vor "allow all;" einlesen
+        if os.path.exists(self.blocklist_file):
+            with open(self.blocklist_file, "r") as f:
+                for line in f:
+                    if "allow all;" in line:
+                        allow_seen = True
+                        break
+                    if line.strip() and not line.strip().startswith("#"):
+                        lines.append(line.strip())
+
+        # Neue deny-Liste schreiben
+        with open(self.blocklist_file, "w") as f:
+            for ip in sorted(blocked_ips):
+                f.write(f"deny {ip};\n")
+            if allow_seen:
+                f.write("allow all;\n")
         meta[ip] = datetime.utcnow().isoformat()
         self.save_meta(meta)
         self.log(f"Blocked IP {ip} in NGINX.")
