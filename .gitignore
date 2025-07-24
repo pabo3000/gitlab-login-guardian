@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Tox
+.tox/
+.cache/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+.python-version
+
+# Test output and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# pytest fixtures and temp data (if accidentally left)
+tests/fixtures/*.log
+tests/fixtures/*.tmp
+tests/fixtures/*.bak
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# pipenv
+Pipfile.lock
+
+# Installer artifacts
+*.egg-info/
+*.egg
+.eggs/
