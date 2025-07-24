@@ -2,7 +2,7 @@ from gitlab_login_guardian import GitlabLoginGuardian
 
 guardian = GitlabLoginGuardian(
     log_file="/var/log/gitlab/gitlab-rails/production_json.log",
-    ban_log="/etc/gitlab/nginx/custom/gitlab-login-ban.log",
+    ban_log="/var/log/gitlab-login-ban.log",
     blocklist_file="/etc/gitlab/nginx/custom/ip_blocklist.conf",
     meta_file="/etc/gitlab/nginx/custom/ip_blocklist_meta.json",
 )
