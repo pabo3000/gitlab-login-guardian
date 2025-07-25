@@ -22,13 +22,9 @@ A Python script that monitors failed login attempts on a GitLab Omnibus instance
 The script uses the following internal constants:
 
 ```python
-LOGFILE = "/var/log/gitlab/gitlab-rails/production_json.log"
-BAN_LOG = "/var/log/gitlab-login-ban.log"
 MAX_RETRIES = 3
 FIND_TIME_SECONDS = 3600  # 1 hour
-NGINX_BLOCKLIST = "/etc/gitlab/nginx/custom/ip_blocklist.conf"
-NGINX_META_FILE = "/etc/gitlab/nginx/custom/ip_blocklist_meta.json"
-BAN_DURATION_HOURS = 164
+BAN_DURATION_HOURS = 164  # 1 week
 ```
 
 ## 🛠 Installation with setup.sh
@@ -115,6 +111,23 @@ allow all;
 ```
 
 Important: All deny rules must appear before allow all; in the file.
+
+## ✅ Observe the effort
+
+Open 4 ssh terminals
+
+1. Observe the attempts to sign in:
+```tail -f /var/log/gitlab/gitlab-rails/production_json.log | jq -c 'select(.path == "/users/sign_in" and .method == "POST") | {time, remote_ip, user: (.params[]? | select(.key == "user") | .value.login)}'```
+
+2. Observe the guardian's log: 
+```tail -f /var/log/gitlab-login-ban.log```
+
+3. Observe how nginx blocks: 
+```tail -f /var/log/gitlab/nginx/gitlab_error.log```
+
+4. Observe the banned ips and here you can unban: 
+```nano /etc/gitlab/nginx/custom/ip_blocklist.conf```
+
 
 ## 📦 Ideas for Future Improvements
 
